@@ -12,10 +12,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.app.apuntes.domain.model.Materia
 import com.app.apuntes.presentation.navigation.Apuntes
+import com.app.apuntes.presentation.navigation.CrearMateria
 import com.app.apuntes.presentation.viewmodel.DashboardViewModel
 import com.app.apuntes.presentation.viewmodel.MateriasUiState
 
@@ -42,6 +47,13 @@ fun DashboardScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Mis Materias") })
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navController.navigate(CrearMateria) }
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Agregar materia")
+            }
         }
     ) { paddingValues ->
         Box(
@@ -55,10 +67,18 @@ fun DashboardScreen(navController: NavController) {
                 }
                 is MateriasUiState.Success -> {
                     if (state.materias.isEmpty()) {
-                        Text(
-                            text = "No hay materias registradas",
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+                        Column(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("No hay materias registradas")
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Toca + para agregar tu primera materia",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
                     } else {
                         LazyColumn(
                             contentPadding = PaddingValues(16.dp),
@@ -67,7 +87,6 @@ fun DashboardScreen(navController: NavController) {
                             items(state.materias) { materia ->
                                 MateriaCard(
                                     materia = materia,
-                                    apuntesCount = viewModel.contarApuntes(materia.id),
                                     onClick = { navController.navigate(Apuntes(materiaId = materia.id)) }
                                 )
                             }
@@ -87,7 +106,7 @@ fun DashboardScreen(navController: NavController) {
 }
 
 @Composable
-fun MateriaCard(materia: Materia, apuntesCount: Int, onClick: () -> Unit) {
+fun MateriaCard(materia: Materia, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -103,12 +122,6 @@ fun MateriaCard(materia: Materia, apuntesCount: Int, onClick: () -> Unit) {
             materia.horario?.let {
                 Text(text = "Horario: $it", style = MaterialTheme.typography.bodySmall)
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "$apuntesCount apunte${if (apuntesCount != 1) "s" else ""}",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
         }
     }
 }

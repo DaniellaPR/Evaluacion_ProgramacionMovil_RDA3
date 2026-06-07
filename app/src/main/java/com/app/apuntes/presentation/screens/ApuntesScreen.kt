@@ -32,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.app.apuntes.data.SampleData
 import com.app.apuntes.domain.model.Apunte
 import com.app.apuntes.presentation.navigation.DetalleApunte
 import com.app.apuntes.presentation.viewmodel.ApuntesUiState

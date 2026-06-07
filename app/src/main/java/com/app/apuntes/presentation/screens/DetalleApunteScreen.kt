@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.app.apuntes.data.SampleData
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

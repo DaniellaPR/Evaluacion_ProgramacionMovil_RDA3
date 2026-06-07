@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.app.apuntes.data.SampleData
 import com.app.apuntes.domain.model.Horario
 
 @OptIn(ExperimentalMaterial3Api::class)
