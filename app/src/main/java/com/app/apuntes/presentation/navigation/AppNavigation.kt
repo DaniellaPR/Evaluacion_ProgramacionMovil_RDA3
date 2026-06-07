@@ -23,6 +23,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.app.apuntes.presentation.screens.ApuntesScreen
+import com.app.apuntes.presentation.screens.CrearApunteScreen
+import com.app.apuntes.presentation.screens.CrearMateriaScreen
 import com.app.apuntes.presentation.screens.DashboardScreen
 import com.app.apuntes.presentation.screens.DetalleApunteScreen
 import com.app.apuntes.presentation.screens.HorarioScreen
@@ -105,6 +107,13 @@ fun AppNavigation() {
             composable<DetalleApunte> { backStackEntry ->
                 val route: DetalleApunte = backStackEntry.toRoute()
                 DetalleApunteScreen(apunteId = route.apunteId, navController = navController)
+            }
+            composable<CrearMateria> {
+                CrearMateriaScreen(navController = navController)
+            }
+            composable<CrearApunte> { backStackEntry ->
+                val route: CrearApunte = backStackEntry.toRoute()
+                CrearApunteScreen(materiaId = route.materiaId, navController = navController)
             }
         }
     }

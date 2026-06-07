@@ -14,10 +14,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.app.apuntes.domain.model.Apunte
+import com.app.apuntes.presentation.navigation.CrearApunte
 import com.app.apuntes.presentation.navigation.DetalleApunte
 import com.app.apuntes.presentation.viewmodel.ApuntesUiState
 import com.app.apuntes.presentation.viewmodel.ApuntesViewModel
@@ -47,21 +50,24 @@ fun ApuntesScreen(materiaId: Long, navController: NavController) {
         factory = ApuntesViewModel.provideFactory(materiaId)
     )
     val uiState by viewModel.uiState.collectAsState()
-    val materia = SampleData.materias.find { it.id == materiaId }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(materia?.nombre ?: "Apuntes") },
+                title = { Text("Apuntes") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Regresar"
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Regresar")
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navController.navigate(CrearApunte(materiaId = materiaId)) }
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Agregar apunte")
+            }
         }
     ) { paddingValues ->
         Box(
@@ -75,10 +81,18 @@ fun ApuntesScreen(materiaId: Long, navController: NavController) {
                 }
                 is ApuntesUiState.Success -> {
                     if (state.apuntes.isEmpty()) {
-                        Text(
-                            text = "No hay apuntes para esta materia",
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+                        Column(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("No hay apuntes para esta materia")
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Toca + para agregar tu primer apunte",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
                     } else {
                         LazyColumn(
                             contentPadding = PaddingValues(16.dp),

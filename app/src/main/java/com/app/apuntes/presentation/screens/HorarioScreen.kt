@@ -23,12 +23,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.app.apuntes.domain.model.Horario
+import com.app.apuntes.domain.model.Materia
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HorarioScreen(navController: NavController) {
+    // Datos locales temporales — el integrante 3 conectará Room aquí
+    val materias = listOf(
+        Materia(1L, "Programación Móvil", "Dr. García", "Lun-Mié 08:00-10:00"),
+        Materia(2L, "Diseño de Interiores", "Arq. López", "Mar-Jue 10:00-12:00"),
+        Materia(3L, "Estructuras", "Ing. Martínez", "Vie 14:00-17:00"),
+        Materia(4L, "Creatividad e Innovación", "Mtra. Torres", "Lun-Mié 12:00-14:00")
+    )
+    val horarios = listOf(
+        Horario(1L, 1L, "Lunes", "08:00", "10:00", "Aula 301"),
+        Horario(2L, 1L, "Miércoles", "08:00", "10:00", "Aula 301"),
+        Horario(3L, 2L, "Martes", "10:00", "12:00", "Taller B"),
+        Horario(4L, 2L, "Jueves", "10:00", "12:00", "Taller B"),
+        Horario(5L, 3L, "Viernes", "14:00", "17:00", "Lab. Estructuras"),
+        Horario(6L, 4L, "Lunes", "12:00", "14:00", "Aula 205"),
+        Horario(7L, 4L, "Miércoles", "12:00", "14:00", "Aula 205")
+    )
+
     val diasOrdenados = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes")
-    val horariosPorDia = SampleData.horarios.groupBy { it.dia }
+    val horariosPorDia = horarios.groupBy { it.dia }
 
     Scaffold(
         topBar = {
@@ -45,7 +63,8 @@ fun HorarioScreen(navController: NavController) {
             items(diasOrdenados.filter { horariosPorDia.containsKey(it) }) { dia ->
                 HorarioDiaSection(
                     dia = dia,
-                    horarios = horariosPorDia[dia] ?: emptyList()
+                    horarios = horariosPorDia[dia] ?: emptyList(),
+                    materias = materias
                 )
             }
         }
@@ -53,7 +72,7 @@ fun HorarioScreen(navController: NavController) {
 }
 
 @Composable
-private fun HorarioDiaSection(dia: String, horarios: List<Horario>) {
+private fun HorarioDiaSection(dia: String, horarios: List<Horario>, materias: List<Materia>) {
     Column {
         Text(
             text = dia,
@@ -62,7 +81,7 @@ private fun HorarioDiaSection(dia: String, horarios: List<Horario>) {
         )
         Spacer(modifier = Modifier.height(8.dp))
         horarios.forEach { horario ->
-            val materia = SampleData.materias.find { it.id == horario.materiaId }
+            val materia = materias.find { it.id == horario.materiaId }
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)

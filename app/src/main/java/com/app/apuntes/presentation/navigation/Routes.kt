@@ -22,3 +22,9 @@ data class Apuntes(val materiaId: Long)
 
 @Serializable
 data class DetalleApunte(val apunteId: Long)
+
+@Serializable
+data object CrearMateria
+
+@Serializable
+data class CrearApunte(val materiaId: Long)

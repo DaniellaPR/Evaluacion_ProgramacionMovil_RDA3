@@ -25,7 +25,11 @@ import androidx.navigation.NavController
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PerfilScreen(navController: NavController) {
-    val perfil = SampleData.perfil
+    // Datos fijos temporales — el integrante 3 puede conectar Room aquí
+    val nombre = "Estudiante Demo"
+    val codigo = "2021001234"
+    val carrera = "Arquitectura"
+    val semestre = 5
 
     Scaffold(
         topBar = {
@@ -47,25 +51,15 @@ fun PerfilScreen(navController: NavController) {
                 tint = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.height(12.dp))
-            Text(text = perfil.nombre, style = MaterialTheme.typography.headlineSmall)
+            Text(text = nombre, style = MaterialTheme.typography.headlineSmall)
             Spacer(modifier = Modifier.height(24.dp))
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    PerfilInfoRow(label = "Código estudiantil", value = perfil.codigo)
+                    PerfilInfoRow(label = "Código estudiantil", value = codigo)
                     Spacer(modifier = Modifier.height(12.dp))
-                    PerfilInfoRow(label = "Carrera", value = perfil.carrera)
+                    PerfilInfoRow(label = "Carrera", value = carrera)
                     Spacer(modifier = Modifier.height(12.dp))
-                    PerfilInfoRow(label = "Semestre", value = "${perfil.semestre}°")
-                    Spacer(modifier = Modifier.height(12.dp))
-                    PerfilInfoRow(
-                        label = "Materias inscritas",
-                        value = "${SampleData.materias.size}"
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    PerfilInfoRow(
-                        label = "Total de apuntes",
-                        value = "${SampleData.apuntes.size}"
-                    )
+                    PerfilInfoRow(label = "Semestre", value = "$semestre°")
                 }
             }
         }
