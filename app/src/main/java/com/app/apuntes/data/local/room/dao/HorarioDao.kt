@@ -26,4 +26,7 @@ interface HorarioDao {
 
     @Delete
     suspend fun eliminar(horario: HorarioEntity)
+
+    @Query("DELETE FROM horarios WHERE id = :id")
+    suspend fun eliminarPorId(id: Long)
 }
