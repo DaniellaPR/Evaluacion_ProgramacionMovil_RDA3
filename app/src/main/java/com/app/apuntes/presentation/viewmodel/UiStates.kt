@@ -21,3 +21,10 @@ sealed class HorarioUiState {
     data class Success(val horarios: List<Horario>) : HorarioUiState()
     data class Error(val mensaje: String) : HorarioUiState()
 }
+
+sealed class RecursosUiState {
+    object Loading : RecursosUiState()
+    data class Success(val recursos: List<com.app.apuntes.domain.model.Recurso>) : RecursosUiState()
+    data class Error(val mensaje: String) : RecursosUiState()
+}
+
