@@ -28,3 +28,22 @@ sealed class RecursosUiState {
     data class Error(val mensaje: String) : RecursosUiState()
 }
 
+sealed interface ScannerUiState {
+    data object EsperandoCaptura : ScannerUiState
+    data object ProcesandoImagen : ScannerUiState
+    data class TextoReconocido(val texto: String) : ScannerUiState
+    data class Error(val mensaje: String) : ScannerUiState
+}
+
+sealed interface GuardadoApunteUiState {
+    data object Idle : GuardadoApunteUiState
+    data object Guardando : GuardadoApunteUiState
+    data class Success(val materiaId: Long) : GuardadoApunteUiState
+    data class Error(val mensaje: String) : GuardadoApunteUiState
+}
+
+data class OcrEditorFormState(
+    val materiaId: Long? = null,
+    val titulo: String = "",
+    val contenido: String = ""
+)

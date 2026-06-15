@@ -12,6 +12,12 @@ data object Horario
 data object Scanner
 
 @Serializable
+data object ResultadoOCR
+
+@Serializable
+data object EditarApunteOCR
+
+@Serializable
 data object QR
 
 @Serializable

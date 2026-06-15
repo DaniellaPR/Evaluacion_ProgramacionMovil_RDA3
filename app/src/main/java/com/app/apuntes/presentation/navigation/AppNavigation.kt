@@ -27,9 +27,11 @@ import com.app.apuntes.presentation.screens.CrearApunteScreen
 import com.app.apuntes.presentation.screens.CrearMateriaScreen
 import com.app.apuntes.presentation.screens.DashboardScreen
 import com.app.apuntes.presentation.screens.DetalleApunteScreen
+import com.app.apuntes.presentation.screens.EditarApunteScreen
 import com.app.apuntes.presentation.screens.HorarioScreen
 import com.app.apuntes.presentation.screens.PerfilScreen
 import com.app.apuntes.presentation.screens.QRScreen
+import com.app.apuntes.presentation.screens.ResultadoOCRScreen
 import com.app.apuntes.presentation.screens.ScannerScreen
 import kotlin.reflect.KClass
 
@@ -93,6 +95,12 @@ fun AppNavigation() {
             }
             composable<Scanner> {
                 ScannerScreen(navController = navController)
+            }
+            composable<ResultadoOCR> {
+                ResultadoOCRScreen(navController = navController)
+            }
+            composable<EditarApunteOCR> {
+                EditarApunteScreen(navController = navController)
             }
             composable<QR> {
                 QRScreen(navController = navController)
