@@ -47,3 +47,32 @@ data class OcrEditorFormState(
     val titulo: String = "",
     val contenido: String = ""
 )
+
+sealed interface TtsUiState {
+    data object Idle : TtsUiState
+    data object Hablando : TtsUiState
+    data class Error(val mensaje: String) : TtsUiState
+}
+
+sealed interface QrGenerarState {
+    data object Idle : QrGenerarState
+    data object Generando : QrGenerarState
+    data class QrGenerado(
+        val bitmap: android.graphics.Bitmap,
+        val excedioLimite: Boolean,
+        val titulo: String
+    ) : QrGenerarState
+    data class Error(val mensaje: String) : QrGenerarState
+}
+
+sealed interface QrEscanearState {
+    data object Esperando : QrEscanearState
+    data object Procesando : QrEscanearState
+    data object TextoRecibido : QrEscanearState
+    data class Error(val mensaje: String) : QrEscanearState
+}
+
+data class QrGuardarFormState(
+    val titulo: String = "",
+    val materiaId: Long? = null
+)

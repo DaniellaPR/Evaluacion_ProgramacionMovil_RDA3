@@ -8,6 +8,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.app.apuntes.core.tts.TextToSpeechManager
 import com.app.apuntes.data.local.room.DatabaseProvider
 import com.app.apuntes.data.repository.ApunteRepositoryImpl
 import com.app.apuntes.domain.model.Apunte
@@ -31,11 +32,45 @@ class DetalleApunteViewModel(
     private val _cargando = MutableStateFlow(true)
     val cargando: StateFlow<Boolean> = _cargando
 
+    private val ttsManager = TextToSpeechManager(application)
+
+    private val _ttsState = MutableStateFlow<TtsUiState>(TtsUiState.Idle)
+    val ttsState: StateFlow<TtsUiState> = _ttsState
+
     init {
         viewModelScope.launch {
             _apunte.value = repository.obtenerApuntePorId(apunteId)
             _cargando.value = false
         }
+    }
+
+    fun escucharApunte() {
+        val a = _apunte.value ?: return
+        val texto = "${a.titulo}. ${a.contenido}".trim()
+        if (texto.isBlank()) {
+            _ttsState.value = TtsUiState.Error("El apunte no tiene contenido para reproducir")
+            return
+        }
+        _ttsState.value = TtsUiState.Hablando
+        ttsManager.hablar(texto) {
+            _ttsState.value = TtsUiState.Idle
+        }
+    }
+
+    fun detenerLectura() {
+        ttsManager.detener()
+        _ttsState.value = TtsUiState.Idle
+    }
+
+    fun limpiarErrorTts() {
+        if (_ttsState.value is TtsUiState.Error) {
+            _ttsState.value = TtsUiState.Idle
+        }
+    }
+
+    override fun onCleared() {
+        ttsManager.liberar()
+        super.onCleared()
     }
 
     companion object {
