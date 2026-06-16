@@ -28,10 +28,13 @@ import com.app.apuntes.presentation.screens.CrearMateriaScreen
 import com.app.apuntes.presentation.screens.DashboardScreen
 import com.app.apuntes.presentation.screens.DetalleApunteScreen
 import com.app.apuntes.presentation.screens.EditarApunteScreen
+import com.app.apuntes.presentation.screens.EscanearQRScreen
+import com.app.apuntes.presentation.screens.GenerarQRScreen
 import com.app.apuntes.presentation.screens.HorarioScreen
 import com.app.apuntes.presentation.screens.PerfilScreen
 import com.app.apuntes.presentation.screens.QRScreen
 import com.app.apuntes.presentation.screens.ResultadoOCRScreen
+import com.app.apuntes.presentation.screens.ResultadoQRScreen
 import com.app.apuntes.presentation.screens.ScannerScreen
 import kotlin.reflect.KClass
 
@@ -104,6 +107,16 @@ fun AppNavigation() {
             }
             composable<QR> {
                 QRScreen(navController = navController)
+            }
+            composable<EscanearQR> {
+                EscanearQRScreen(navController = navController)
+            }
+            composable<ResultadoQR> {
+                ResultadoQRScreen(navController = navController)
+            }
+            composable<GenerarQR> { backStackEntry ->
+                val route: GenerarQR = backStackEntry.toRoute()
+                GenerarQRScreen(apunteId = route.apunteId, navController = navController)
             }
             composable<Perfil> {
                 PerfilScreen(navController = navController)

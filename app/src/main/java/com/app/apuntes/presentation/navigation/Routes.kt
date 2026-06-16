@@ -34,3 +34,12 @@ data object CrearMateria
 
 @Serializable
 data class CrearApunte(val materiaId: Long)
+
+@Serializable
+data class GenerarQR(val apunteId: Long)
+
+@Serializable
+data object EscanearQR
+
+@Serializable
+data object ResultadoQR
