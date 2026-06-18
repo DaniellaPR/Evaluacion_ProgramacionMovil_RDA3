@@ -7,12 +7,12 @@ fun MateriaEntity.toDomain(): Materia = Materia(
     id = id,
     nombre = nombre,
     docente = docente,
-    horario = horario
+    descripcion = descripcion
 )
 
 fun Materia.toEntity(): MateriaEntity = MateriaEntity(
     id = id,
     nombre = nombre,
     docente = docente,
-    horario = horario
+    descripcion = descripcion
 )

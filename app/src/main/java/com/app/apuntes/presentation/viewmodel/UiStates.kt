@@ -23,10 +23,12 @@ sealed class HorarioUiState {
 }
 
 sealed class RecursosUiState {
+    object Idle : RecursosUiState()      // sin materias: sección oculta
     object Loading : RecursosUiState()
     data class Success(val recursos: List<com.app.apuntes.domain.model.Recurso>) : RecursosUiState()
     data class Error(val mensaje: String) : RecursosUiState()
 }
+
 
 sealed interface ScannerUiState {
     data object EsperandoCaptura : ScannerUiState

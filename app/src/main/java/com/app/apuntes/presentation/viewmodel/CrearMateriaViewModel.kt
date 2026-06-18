@@ -25,9 +25,9 @@ class CrearMateriaViewModel(
         get() = savedStateHandle["docente"] ?: ""
         set(value) { savedStateHandle["docente"] = value }
 
-    var horario: String
-        get() = savedStateHandle["horario"] ?: ""
-        set(value) { savedStateHandle["horario"] = value }
+    var descripcion: String
+        get() = savedStateHandle["descripcion"] ?: ""
+        set(value) { savedStateHandle["descripcion"] = value }
 
     private val _guardadoExitoso = MutableStateFlow(false)
     val guardadoExitoso: StateFlow<Boolean> = _guardadoExitoso
@@ -50,7 +50,7 @@ class CrearMateriaViewModel(
                     Materia(
                         nombre = nombreVal,
                         docente = docente.trim().ifBlank { null },
-                        horario = horario.trim().ifBlank { null }
+                        descripcion = descripcion.trim().ifBlank { null }
                     )
                 )
                 _guardadoExitoso.value = true

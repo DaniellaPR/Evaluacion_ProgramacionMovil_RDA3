@@ -14,7 +14,9 @@ object DatabaseProvider {
                 context.applicationContext,
                 AppDatabase::class.java,
                 "apuntes_database"
-            ).build()
+            ).addMigrations(AppDatabase.MIGRATION_1_2)
+             .build()
+
             INSTANCE = instance
             instance
         }

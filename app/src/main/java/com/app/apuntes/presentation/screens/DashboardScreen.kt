@@ -31,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -84,14 +85,6 @@ fun DashboardScreen(navController: NavController) {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // Sección 1: Listado de Materias
-                item {
-                    Text(
-                        text = "Mis Materias",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-
                 when (val state = uiState) {
                     is MateriasUiState.Loading -> {
                         item {
@@ -145,44 +138,47 @@ fun DashboardScreen(navController: NavController) {
                     }
                 }
 
-                // Sección 2: Recursos Académicos (Retrofit)
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Recursos Recomendados",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-
-                item {
-                    when (val recState = recursosState) {
-                        is RecursosUiState.Loading -> {
-                            Box(modifier = Modifier.fillMaxWidth().height(120.dp)) {
-                                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                // Sección 2: Recursos Académicos — se oculta si no hay materias (Idle)
+                if (recursosState !is RecursosUiState.Idle) {
+                    item {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Recursos Recomendados",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+                    item {
+                        when (val recState = recursosState) {
+                            is RecursosUiState.Idle -> { /* nunca llega aquí por el if externo */ }
+                            is RecursosUiState.Loading -> {
+                                Box(modifier = Modifier.fillMaxWidth().height(120.dp)) {
+                                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                                }
                             }
-                        }
-                        is RecursosUiState.Success -> {
-                            LazyRow(
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                contentPadding = PaddingValues(vertical = 4.dp)
-                            ) {
-                                items(recState.recursos) { recurso ->
-                                    RecursoCard(recurso = recurso) {
-                                        recursoSeleccionado = recurso
+                            is RecursosUiState.Success -> {
+                                LazyRow(
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    contentPadding = PaddingValues(vertical = 4.dp)
+                                ) {
+                                    items(recState.recursos) { recurso ->
+                                        RecursoCard(recurso = recurso) {
+                                            recursoSeleccionado = recurso
+                                        }
                                     }
                                 }
                             }
-                        }
-                        is RecursosUiState.Error -> {
-                            Text(
-                                text = recState.mensaje,
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.padding(8.dp)
-                            )
+                            is RecursosUiState.Error -> {
+                                Text(
+                                    text = recState.mensaje,
+                                    color = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.padding(8.dp)
+                                )
+                            }
                         }
                     }
                 }
+
             }
         }
     }
@@ -198,12 +194,57 @@ fun DashboardScreen(navController: NavController) {
                 )
             },
             text = {
-                Text(
-                    text = recurso.descripcion,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = "Materia vinculada: ${recurso.materia}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                    recurso.temas?.let { temas ->
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Temas relacionados:",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = temas,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    recurso.fraseInicial?.let { frase ->
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Introducción / Frase inicial:",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "\"$frase\"",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                        )
+                    }
+                }
             },
             confirmButton = {
+                val uriHandler = LocalUriHandler.current
+                TextButton(
+                    onClick = {
+                        try {
+                            uriHandler.openUri(recurso.url)
+                        } catch (e: Exception) {
+                            // Silenciar error si no hay navegador disponible
+                        }
+                    }
+                ) {
+                    Text("Ver en Wikipedia")
+                }
+            },
+            dismissButton = {
                 TextButton(onClick = { recursoSeleccionado = null }) {
                     Text("Cerrar")
                 }
@@ -226,8 +267,13 @@ fun MateriaCard(materia: Materia, onClick: () -> Unit) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(text = "Docente: $it", style = MaterialTheme.typography.bodySmall)
             }
-            materia.horario?.let {
-                Text(text = "Horario: $it", style = MaterialTheme.typography.bodySmall)
+            materia.descripcion?.let {
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
@@ -274,9 +320,11 @@ fun RecursoCard(recurso: Recurso, onClick: () -> Unit) {
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    text = "Consejo de Estudio",
+                    text = recurso.materia,
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                 )
             }
         }

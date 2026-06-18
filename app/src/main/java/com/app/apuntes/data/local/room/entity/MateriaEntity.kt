@@ -8,5 +8,5 @@ data class MateriaEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val nombre: String,
     val docente: String? = null,
-    val horario: String? = null
+    val descripcion: String? = null  // antes: horario
 )

@@ -43,7 +43,7 @@ fun CrearMateriaScreen(navController: NavController) {
     // Estado local de UI vinculado al ViewModel
     var nombre by rememberSaveable { mutableStateOf(viewModel.nombre) }
     var docente by rememberSaveable { mutableStateOf(viewModel.docente) }
-    var horario by rememberSaveable { mutableStateOf(viewModel.horario) }
+    var descripcion by rememberSaveable { mutableStateOf(viewModel.descripcion) }
 
     val guardadoExitoso by viewModel.guardadoExitoso.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -101,14 +101,15 @@ fun CrearMateriaScreen(navController: NavController) {
             )
 
             OutlinedTextField(
-                value = horario,
+                value = descripcion,
                 onValueChange = {
-                    horario = it
-                    viewModel.horario = it
+                    descripcion = it
+                    viewModel.descripcion = it
                 },
-                label = { Text("Horario (opcional, ej: Lun-Mié 08:00-10:00)") },
+                label = { Text("Descripción o notas adicionales (opcional)") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = false,
+                minLines = 2
             )
 
             // Mensaje de error de validación
