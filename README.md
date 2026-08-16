@@ -1,51 +1,107 @@
-# SafePass 2026 - Sistema de Gestión de Check-in
+# Student Management & Academic Assistant App (Android)
 
-Repositorio oficial para el examen práctico de **Programación Móvil (RDA-1)**. Esta aplicación demuestra la implementación de un sistema de gestión de asistentes, aplicando principios de programación segura en **Kotlin** y diseño de interfaces con **Jetpack Compose**.
+Aplicación móvil nativa para Android enfocada en la gestión académica de estudiantes universitarios. Permite administrar materias, horarios de clase, apuntes, recursos educativos y escaneo/gestión de contenido visual.
 
----
-
-## Descripción del Proyecto
-**SafePass 2026** es una solución móvil diseñada para el registro y validación de asistentes a eventos. El desarrollo se centró en la integridad de los datos y la gestión de estados reactivos, asegurando una ejecución estable mediante el uso de operadores de seguridad de Kotlin.
+El proyecto fue desarrollado como examen práctico final para la materia de Programación Móvil en la Pontificia Universidad Católica del Ecuador (PUCE).
 
 ---
 
-## Tecnologías y Conceptos Implementados
+## Arquitectura y Principios de Diseño
 
-El desarrollo integra prácticas de programación moderna bajo los siguientes estándares:
+El proyecto sigue los principios de **Clean Architecture** junto con el patrón de arquitectura **MVVM (Model-View-ViewModel)** recomendado por Google para Android.
 
-* **Arquitectura de Datos:** Uso de `data class` inmutables para la representación de asistentes.
-* **Gestión de Estados:** Implementación de `sealed class` (`RegistroState`) para un control exhaustivo de estados mediante la expresión `when`.
-* **Programación Funcional:** 
-  * **Scope Functions:** `let`, `apply`, `run` para manipulación contextual de objetos.
-  * **Extension Functions:** Para mejorar la legibilidad y modularidad del código.
-  * **Higher-order functions:** Para lógica de negocio desacoplada.
-* **Seguridad:** Validación de entradas con `toIntOrNull()` y `toDoubleOrNull()`, combinados con operadores de seguridad de Kotlin (`?.`, `?:`).
-* **UI:** Interfaz desarrollada en **Jetpack Compose** mediante `Scaffold` y `Column`.
+### Capas del Sistema:
+* **Presentation Layer:** Desarrollada íntegramente con **Jetpack Compose** (UI 100% declarativa) y navegación tipada.
+* **Domain Layer:** Contiene el modelo de dominio puro, casos de uso (`ObtenerMateriasUseCase`, `ObtenerApuntesUseCase`, etc.) e interfaces de repositorios. Libre de dependencias del framework de Android.
+* **Data Layer:** Implementación de repositorios, fuentes de datos locales con **Room** y remotas con **Retrofit**.
 
 ---
 
-## Especificaciones Técnicas
+## Características Principales
+
+* **Dashboard Unificado:** Vista principal con acceso rápido a las materias matriculadas y recursos educativos recomendados.
+* **Gestión de Materias y Horarios:** Registro de asignaturas, docentes y asignación de bloques horarios por día y aula.
+* **Módulo de Apuntes:** Creación, edición y consulta detallada de notas asociadas a cada materia.
+* **Integración de Cámara / Scanner / QR:** Captura y procesamiento visual para escaneo de apontes y lectura de códigos QR.
+* **Consumo de Recursos Educativos:** Integración con API remota vía cliente REST (Retrofit).
+* **Persistencia Local:** Almacenamiento fuera de línea completo y reactivo mediante Room.
+
+---
+
+## Stack Tecnológico
+
 * **Lenguaje:** Kotlin
-* **IDE:** Android Studio
-* **JDK:** Java 21
-* **Target SDK:** API 36 (Android 16)
-* **UI Framework:** Jetpack Compose
+* **UI:** Jetpack Compose
+* **Arquitectura:** Clean Architecture + MVVM
+* **Inyección de Dependencias / Proveedor de BD:** Singleton Thread-Safe (`DatabaseProvider`)
+* **Base de Datos Local:** Room Database 2.6.1 (con DAOs orientados a Flow y KSP 2.0.0)
+* **Conectividad / Red:** Retrofit 2.9.0 + Kotlinx Serialization
+* **Manejo de Estado y Concurrencia:** Kotlin Coroutines, StateFlow, SharedFlow
+* **Navegación:** Type-Safe Jetpack Compose Navigation (`@Serializable` routes)
 
 ---
 
-## Estructura del Informe
-El desarrollo incluyó un informe académico enfocado en:
-1. **Arquitectura:** Flujo de datos y control de estados.
-2. **Seguridad de Interfaz:** Análisis del uso de `sealed class` para prevenir estados inconsistentes en la UI.
-3. **Evidencia de Pruebas:** Capturas de los estados *Idle*, *Success* y *Error* en emulador (API 36).
+## Modelo de Base de Datos (Room)
+
+La base de datos local relaciona las entidades principales del dominio educativo mediante referencias de clave foránea (`materiaId`):
+
+```
+materias (1) ──────── (N) apuntes
+materias (1) ──────── (N) horarios
+```
+
+### Tabla: `materias`
+| Campo | Tipo | Restricción | Descripción |
+|---|---|---|---|
+| id | LONG | PK autoincremental | Identificador único de la materia |
+| nombre | TEXT | NOT NULL | Nombre de la asignatura |
+| docente | TEXT | NULLABLE | Nombre del docente |
+| horario | TEXT | NULLABLE | Descripción rápida del horario |
+
+### Tabla: `horarios`
+| Campo | Tipo | Restricción | Descripción |
+|---|---|---|---|
+| id | LONG | PK autoincremental | Identificador único del registro de horario |
+| materiaId | LONG | NOT NULL (FK) | Referencia a la materia correspondiente |
+| dia | TEXT | NOT NULL | Día de la semana |
+| horaInicio | TEXT | NOT NULL | Hora de inicio de clase |
+| horaFin | TEXT | NOT NULL | Hora de fin de clase |
+| aula | TEXT | NULLABLE | Aula o taller asignado |
 
 ---
 
-## Autores
-* **Materia:** Programación Móvil (RDA-1)
-* **Integrantes del Grupo:**
-  * Yanick Maila
-  * Daniela Pozo
-  * Edwin Israel
-  * Melany Analuisa
-  * Rodrigo Lucano
+## Resiliencia de Estado e Integración Reactiva
+
+### Manejo de Ciclo de Vida y Estado UI
+Se implementó `ViewModel` con `StateFlow` expuesto de forma inmutable (`val uiState: StateFlow<MateriasUiState> = _uiState`). De esta manera, el estado de la pantalla sobrevive a cambios de configuración como la rotación del dispositivo. Los componentes `@Composable` se suscriben mediante `collectAsState()`, garantizando la consistencia de la UI.
+
+### Flujo Reactivo de Datos
+`DatabaseProvider` asegura una instancia única e inmutable de la base de datos aplicando el patrón Singleton Thread-Safe (`@Volatile` + `synchronized`).
+
+Los repositorios concretos (`MateriaRepositoryImpl`, `ApunteRepositoryImpl`) exponen flujos `Flow` de Room y utilizan mappers (`toDomain` / `toEntity`) para desacoplar la base de datos de los modelos del dominio. La recolección continua con `viewModelScope` permite actualización automática e instantánea en componentes como `LazyColumn` en las vistas `DashboardScreen` y `ApuntesScreen`.
+
+---
+
+## Estructura de Commits y Colaboración
+
+El desarrollo se organizó bajo convenciones de Conventional Commits:
+
+* `build:` Configuración inicial de dependencias (`libs.versions.toml`), KSP, Room, Retrofit y serialización.
+* `feat:` Implementación de esquemas Room, DAOs con Flow y serialización de rutas.
+* `feat:` Navegación tipada con rutas `@Serializable` (Dashboard, Apuntes, Detalle, Horario, Perfil, Scanner, QR).
+* `feat:` Formulario de creación de materias/horarios y validación de campos.
+* `feat:` Cliente HTTP con Retrofit para consumo de repositorios remotos.
+
+---
+
+## Créditos y Equipo
+
+Proyecto realizado para la Pontificia Universidad Católica del Ecuador (PUCE) - Facultad de Hábitat, Infraestructura y Creatividad.
+
+**Docente:** Ing. Juan Francisco Chafla Altamirano  
+**Integrantes:**
+* Daniela Pozo
+* Israel Hernández
+* Yanick Maila
+* Melany Analuisa
+* Rodrigo Lucano
